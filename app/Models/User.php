@@ -29,4 +29,48 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Tache 3 — Relation many-to-many avec Project.
+     * withPivot('role') permet d'accéder au rôle depuis la relation.
+     * Exemple : $user->projects->first()->pivot->role
+     */
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class)
+                    ->withPivot('role')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Récupérer les projets où l'utilisateur est responsable.
+     */
+    public function projetsResponsable()
+    {
+        return $this->projects()->wherePivot('role', 'responsable');
+    }
+
+    /**
+     * Vérifier si l'utilisateur est responsable d'un projet donné.
+     */
+    public function isResponsableOf(Project $project): bool
+    {
+        return $this->projects()
+                    ->where('projects.id', $project->id)
+                    ->wherePivot('role', 'responsable')
+                    ->exists();
+    }
+
+    /**
+     * Récupérer le rôle de l'utilisateur dans un projet donné.
+     * Retourne null si l'utilisateur n'est pas membre du projet.
+     */
+    public function getRoleInProject(Project $project): ?string
+    {
+        $pivot = $this->projects()
+                      ->where('projects.id', $project->id)
+                      ->first()?->pivot;
+
+        return $pivot?->role;
+    }
 }

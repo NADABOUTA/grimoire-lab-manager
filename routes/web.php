@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MembreController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectController;
@@ -14,7 +15,12 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
 
-Route::resource('projects', ProjectController::class);
+    Route::resource('projects', ProjectController::class);
+
+    // Routes membres : ajouter et retirer
+    Route::get('/projects/{project}/membres/create', [MembreController::class, 'create'])->name('membres.create');
+    Route::post('/projects/{project}/membres', [MembreController::class, 'store'])->name('membres.store');
+    Route::delete('/projects/{project}/membres/{user}', [MembreController::class, 'destroy'])->name('membres.destroy');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
