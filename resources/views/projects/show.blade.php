@@ -62,6 +62,54 @@
 
             </div>
 
+            <!-- Liste des membres (Tâches 4 et 5 affichées) -->
+            <div class="bg-white shadow rounded-lg p-6 mt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg">Membres du projet</h3>
+                    @can('addMembre', $project)
+                        <a href="{{ route('membres.create', $project) }}" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                            + Ajouter un membre
+                        </a>
+                    @endcan
+                </div>
+
+                @if(session('success'))
+                    <div class="mb-4 bg-green-100 text-green-700 p-4 rounded">
+                        {{ session('success') }}
+                    </div>
+                @endif
+                @if ($errors->has('membre'))
+                    <div class="mb-4 bg-red-100 text-red-700 p-4 rounded">
+                        {{ $errors->first('membre') }}
+                    </div>
+                @endif
+
+                @if($project->users->isEmpty())
+                    <p class="text-gray-500">Aucun membre pour le moment.</p>
+                @else
+                    <ul class="divide-y divide-gray-200">
+                        @foreach($project->users as $membre)
+                            <li class="py-3 flex justify-between items-center">
+                                <div>
+                                    <p class="font-medium text-gray-900">{{ $membre->name }}</p>
+                                    <p class="text-sm text-gray-500">{{ $membre->email }} — <span class="capitalize font-semibold">{{ str_replace('_', ' ', $membre->pivot->role) }}</span></p>
+                                </div>
+                                
+                                @can('removeMembre', $project)
+                                    <form action="{{ route('membres.destroy', [$project, $membre]) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" onclick="return confirm('Retirer ce membre ?')" class="text-red-600 hover:text-red-900 text-sm font-medium">
+                                            Retirer
+                                        </button>
+                                    </form>
+                                @endcan
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+
         </div>
     </div>
 
