@@ -21,8 +21,40 @@
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
+            <!-- Settings & Notifications Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
+                <!-- Notifications Dropdown -->
+                <x-dropdown align="right" width="64">
+                    <x-slot name="trigger">
+                        <button class="relative inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            @if(Auth::user()->unreadNotifications->count() > 0)
+                                <span class="absolute top-1 right-2 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">{{ Auth::user()->unreadNotifications->count() }}</span>
+                            @endif
+                        </button>
+                    </x-slot>
+
+                    <x-slot name="content">
+                        <div class="px-4 py-2 text-xs text-gray-400 uppercase tracking-wider">Notifications</div>
+                        @forelse(Auth::user()->unreadNotifications as $notification)
+                            <form method="POST" action="{{ route('notifications.read', $notification->id) }}">
+                                @csrf
+                                <x-dropdown-link :href="route('notifications.read', $notification->id)"
+                                        onclick="event.preventDefault(); this.closest('form').submit();" class="whitespace-normal border-t border-gray-100">
+                                    <span class="block text-sm font-semibold text-gray-800">{{ $notification->data['project_title'] ?? 'Nouveau projet' }}</span>
+                                    <span class="block text-xs text-gray-600 mt-0.5">{{ $notification->data['message'] ?? 'Vous avez une nouvelle notification' }}</span>
+                                    <span class="block text-xs text-gray-400 mt-1">{{ $notification->created_at->diffForHumans() }}</span>
+                                </x-dropdown-link>
+                            </form>
+                        @empty
+                            <div class="px-4 py-3 text-sm text-gray-500 italic text-center border-t border-gray-100">Aucune notification</div>
+                        @endforelse
+                    </x-slot>
+                </x-dropdown>
+
+                <!-- User Dropdown -->
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">

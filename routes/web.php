@@ -22,6 +22,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/projects/{project}/membres', [MembreController::class, 'store'])->name('membres.store');
     Route::delete('/projects/{project}/membres/{user}', [MembreController::class, 'destroy'])->name('membres.destroy');
 
+    // Route pour marquer une notification comme lue
+    Route::post('/notifications/{id}/read', function ($id) {
+        auth()->user()->notifications()->findOrFail($id)->markAsRead();
+        return back();
+    })->name('notifications.read');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
