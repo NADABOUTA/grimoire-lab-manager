@@ -40,7 +40,10 @@ class ProjectController extends Controller
 {
     $this->authorize('create', Project::class);
 
-    Project::create($request->validated());
+    $project = Project::create($request->validated());
+
+    // Le créateur du projet devient automatiquement le responsable
+    $project->users()->attach(auth()->id(), ['role' => 'responsable']);
 
     return redirect()
         ->route('projects.index')
