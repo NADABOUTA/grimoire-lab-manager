@@ -55,10 +55,12 @@
 
                                 <td class="border px-4 py-2 text-center">
 
-                                    <a href="{{ route('projects.show', $project) }}"
-                                       class="text-blue-600 hover:underline">
-                                        Voir
-                                    </a>
+                                    @can('view', $project)
+                                        <a href="{{ route('projects.show', $project) }}"
+                                           class="text-blue-600 hover:underline">
+                                            Voir
+                                        </a>
+                                    @endcan
 
                                     @can('update', $project)
                                         <a href="{{ route('projects.edit', $project) }}"
