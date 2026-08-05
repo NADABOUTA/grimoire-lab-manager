@@ -4,6 +4,7 @@ use App\Http\Controllers\MembreController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -16,6 +17,16 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
 
     Route::resource('projects', ProjectController::class);
+
+    Route::get('/dashboard/chercheur', [DashboardController::class, 'chercheur'])
+    ->name('dashboard.chercheur');
+
+  Route::get('/dashboard/etudiant', [DashboardController::class, 'etudiant'])
+    ->name('dashboard.etudiant');
+    Route::patch('/projects/{project}/avancement', [ProjectController::class, 'updateAvancement'])
+    ->name('projects.avancement');
+    Route::patch('/projects/{project}/cloturer', [ProjectController::class, 'cloturer'])
+    ->name('projects.cloturer');
 
     // Routes membres : ajouter et retirer
     Route::get('/projects/{project}/membres/create', [MembreController::class, 'create'])->name('membres.create');
