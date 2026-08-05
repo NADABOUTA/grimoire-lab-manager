@@ -21,6 +21,7 @@ class Project extends Model
         'avancement',
     ];
 
+    
     /**
      * Relation many-to-many avec User.
      * withPivot('role') permet d'accéder au rôle depuis la relation.
