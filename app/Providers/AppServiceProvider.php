@@ -6,6 +6,8 @@ use App\Events\MembreAjouteAuProjet;
 use App\Listeners\NotifierMembreAjoute;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use App\Events\ProjetCloture;
+use App\Listeners\GenererRapportProjet;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,10 +27,15 @@ class AppServiceProvider extends ServiceProvider
      * de façon asynchrone (via la queue).
      */
     public function boot(): void
-    {
-        Event::listen(
-            MembreAjouteAuProjet::class,
-            NotifierMembreAjoute::class,
-        );
-    }
+{
+    Event::listen(
+        MembreAjouteAuProjet::class,
+        NotifierMembreAjoute::class,
+    );
+
+    Event::listen(
+        ProjetCloture::class,
+        GenererRapportProjet::class,
+    );
+}
 }

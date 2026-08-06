@@ -13,7 +13,15 @@
                     {{ session('success') }}
                 </div>
             @endif
+          <p>User connecté : {{ auth()->id() }}</p>
 
+@foreach($projects as $project)
+    <p>
+        Projet {{ $project->id }} :
+        view={{ Gate::allows('view', $project) ? 'oui' : 'non' }},
+        update={{ Gate::allows('update', $project) ? 'oui' : 'non' }}
+    </p>
+@endforeach
             @can('create', App\Models\Project::class)
                 <div class="flex justify-end mb-4">
                     <a href="{{ route('projects.create') }}"
