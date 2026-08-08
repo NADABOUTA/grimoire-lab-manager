@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use App\Events\ProjetCloture;
 use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
@@ -114,6 +115,30 @@ class ProjectController extends Controller
             ->route('projects.show', $project)
             ->with('success', 'Avancement mis à jour avec succès.');
     }
+
+
+/**
+ * Clôturer le projet.
+ * Réservé au responsable.
+ */
+public function cloturer(Project $project)
+{
+    $this->authorize('cloturer', $project);
+
+    $project->update([
+        'status' => 'cloture',
+    ]);
+
+    // Déclencher la génération asynchrone du rapport
+    event(new ProjetCloture($project));
+
+    return redirect()
+        ->route('projects.show', $project)
+        ->with(
+            'success',
+            'Projet clôturé avec succès. Le rapport sera généré en arrière-plan.'
+        );
+}    
 
     /**
      * Archiver le projet avec SoftDeletes.

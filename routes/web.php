@@ -31,6 +31,13 @@ Route::middleware('auth')->group(function () {
         [ProjectController::class, 'updateAvancement']
     )->name('projects.avancement');
 
+
+    // Clôturer un projet
+Route::patch(
+    '/projects/{project}/cloturer',
+    [ProjectController::class, 'cloturer']
+)->name('projects.cloturer');
+
     // CRUD des projets
     Route::resource('projects', ProjectController::class);
 
