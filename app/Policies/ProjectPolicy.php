@@ -8,7 +8,8 @@ use App\Models\User;
 class ProjectPolicy
 {
     /**
-     * Tout utilisateur connecté peut voir la liste des projets.
+     * Un utilisateur connecté peut consulter la liste
+     * des projets auxquels il appartient.
      */
     public function viewAny(User $user): bool
     {
@@ -16,7 +17,8 @@ class ProjectPolicy
     }
 
     /**
-     * Un utilisateur peut consulter un projet s'il en est membre.
+     * Un utilisateur peut consulter un projet
+     * s'il en est membre.
      */
     public function view(User $user, Project $project): bool
     {
@@ -32,7 +34,7 @@ class ProjectPolicy
     }
 
     /**
-     * Seul le responsable du projet peut le modifier.
+     * Seul le responsable peut modifier les informations générales.
      */
     public function update(User $user, Project $project): bool
     {
@@ -40,25 +42,49 @@ class ProjectPolicy
     }
 
     /**
-     * Seul le responsable du projet peut le supprimer (archiver).
+     * Seul le responsable peut archiver le projet.
      */
     public function delete(User $user, Project $project): bool
     {
         return $project->isResponsable($user);
     }
 
+    /**
+     * Seul le responsable peut restaurer un projet archivé.
+     */
     public function restore(User $user, Project $project): bool
     {
         return $project->isResponsable($user);
     }
 
+    /**
+     * Suppression définitive.
+     */
     public function forceDelete(User $user, Project $project): bool
     {
         return $project->isResponsable($user);
     }
 
     /**
-     * Tache 4 — Seul le responsable peut ajouter un membre.
+     * Le chercheur peut uniquement modifier l'avancement.
+     */
+    public function updateAvancement(User $user, Project $project): bool
+    {
+        return $project->chercheurs()
+            ->where('users.id', $user->id)
+            ->exists();
+    }
+
+    /**
+     * Seul le responsable peut consulter les projets archivés.
+     */
+    public function viewArchived(User $user): bool
+    {
+        return $user->projetsResponsable()->exists();
+    }
+
+    /**
+     * Seul le responsable peut ajouter un membre.
      */
     public function addMembre(User $user, Project $project): bool
     {
@@ -66,7 +92,7 @@ class ProjectPolicy
     }
 
     /**
-     * Tache 5 — Seul le responsable peut retirer un membre.
+     * Seul le responsable peut retirer un membre.
      */
     public function removeMembre(User $user, Project $project): bool
     {

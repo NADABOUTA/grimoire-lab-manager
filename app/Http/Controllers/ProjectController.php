@@ -3,98 +3,146 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 
 class ProjectController extends Controller
 {
+    use AuthorizesRequests;
 
- use AuthorizesRequests;
     /**
-     * Display a listing of the resource.
+     * Afficher uniquement les projets auxquels l'utilisateur appartient.
      */
     public function index()
-{
-    $this->authorize('viewAny', Project::class);
+    {
+        $this->authorize('viewAny', Project::class);
 
-    $projects = Project::latest()->get();
+        $projects = auth()->user()
+            ->projects()
+            ->with('users')
+            ->latest()
+            ->get();
 
-    return view('projects.index', compact('projects'));
-}
+        return view('projects.index', compact('projects'));
+    }
 
     /**
-     * Show the form for creating a new resource.
+     * Formulaire de création.
      */
-   public function create()
-{
-    $this->authorize('create', Project::class);
+    public function create()
+    {
+        $this->authorize('create', Project::class);
 
-    return view('projects.create');
-}
+        return view('projects.create');
+    }
 
     /**
-     * Store a newly created resource in storage.
+     * Enregistrer un nouveau projet.
      */
-   public function store(StoreProjectRequest $request)
-{
-    $this->authorize('create', Project::class);
+    public function store(StoreProjectRequest $request)
+    {
+        $this->authorize('create', Project::class);
 
-    $project = Project::create($request->validated());
+        $project = Project::create($request->validated());
 
-    // Le créateur du projet devient automatiquement le responsable
-    $project->users()->attach(auth()->id(), ['role' => 'responsable']);
+        // Le créateur devient automatiquement responsable.
+        $project->users()->attach(auth()->id(), [
+            'role' => 'responsable'
+        ]);
 
-    return redirect()
-        ->route('projects.index')
-        ->with('success', 'Projet créé avec succès.');
-}
+        return redirect()
+            ->route('projects.index')
+            ->with('success', 'Projet créé avec succès.');
+    }
 
     /**
-     * Display the specified resource.
+     * Afficher un projet.
      */
-   public function show(Project $project)
-{
-    $this->authorize('view', $project);
+    public function show(Project $project)
+    {
+        $this->authorize('view', $project);
 
-    return view('projects.show', compact('project'));
-}
+        // Eager Loading des membres.
+        $project->load('users');
+
+        return view('projects.show', compact('project'));
+    }
 
     /**
-     * Show the form for editing the specified resource.
+     * Formulaire de modification.
      */
-   public function edit(Project $project)
-{
-    $this->authorize('update', $project);
+    public function edit(Project $project)
+    {
+        $this->authorize('update', $project);
 
-    return view('projects.edit', compact('project'));
-}
+        return view('projects.edit', compact('project'));
+    }
 
     /**
-     * Update the specified resource in storage.
+     * Modifier les informations générales du projet.
      */
-   public function update(UpdateProjectRequest $request, Project $project)
-{
-    $this->authorize('update', $project);
+    public function update(UpdateProjectRequest $request, Project $project)
+    {
+        $this->authorize('update', $project);
 
-    $project->update($request->validated());
+        $project->update($request->validated());
 
-    return redirect()
-        ->route('projects.index')
-        ->with('success', 'Projet mis à jour avec succès.');
-}
+        return redirect()
+            ->route('projects.index')
+            ->with('success', 'Projet mis à jour avec succès.');
+    }
 
     /**
-     * Remove the specified resource from storage.
+     * Mettre à jour uniquement l'avancement.
+     * Réservé au chercheur.
+     */
+    public function updateAvancement(Request $request, Project $project)
+    {
+        $this->authorize('updateAvancement', $project);
+
+        $request->validate([
+            'avancement' => ['required', 'integer', 'min:0', 'max:100'],
+        ]);
+
+        $project->update([
+            'avancement' => $request->avancement,
+        ]);
+
+        return redirect()
+            ->route('projects.show', $project)
+            ->with('success', 'Avancement mis à jour avec succès.');
+    }
+
+    /**
+     * Archiver le projet avec SoftDeletes.
      */
     public function destroy(Project $project)
-{
-    $this->authorize('delete', $project);
+    {
+        $this->authorize('delete', $project);
 
-    $project->delete();
+        $project->delete();
 
-    return redirect()
-        ->route('projects.index')
-        ->with('success', 'Projet supprimé avec succès.');
-}
+        return redirect()
+            ->route('projects.index')
+            ->with('success', 'Projet archivé avec succès.');
+    }
+
+    /**
+     * Afficher les projets archivés du responsable.
+     */
+    public function archived()
+    {
+        $this->authorize('viewArchived', Project::class);
+
+        $projects = auth()->user()
+            ->projetsResponsable()
+            ->onlyTrashed()
+            ->with('users')
+            ->latest('deleted_at')
+            ->get();
+
+        return view('projects.archived', compact('projects'));
+    }
 }

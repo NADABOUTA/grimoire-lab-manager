@@ -1,58 +1,192 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🧪 Grimoire — Système de Gestion de Projets de Recherche Universitaire
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38BDF8?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📌 À propos du projet
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Grimoire** est une application web conçue pour les laboratoires de recherche universitaires chez **TechLab Solutions**. Elle remplace la gestion manuelle par tableurs et e-mails par une plateforme centralisée avec :
+- **Authentification sécurisée** et gestion fine des permissions par projet.
+- **Rôles contextuels par projet** (Responsable, Chercheur, Étudiant Assistant) stockés via table pivot.
+- **Archivage sécurisé** des projets (SoftDeletes).
+- **Traitements asynchrones (Queues/Events/Listeners)** pour la notification des membres et la génération des rapports de clôture.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 👥 Règles de Gestion & Rôles par Projet
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Chaque utilisateur possède un rôle propre **au sein de chaque projet** (`project_user` pivot table) :
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Rôle | Consultation | Modification Info Générale | Mise à jour Avancement | Gestion de l'Équipe | Suppression / Archivage |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Responsable** | ✅ Oui | ✅ Oui | ✅ Oui | ✅ Ajouter / Retirer | ✅ SoftDelete / Clôture |
+| **Chercheur** | ✅ Oui | ❌ Non | ✅ Oui (`avancement %`) | ❌ Non | ❌ Non |
+| **Étudiant Assistant** | ✅ Oui | ❌ Non | ❌ Non (Lecture seule) | ❌ Non | ❌ Non |
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 🔒 Règles Métier Clés
+1. **Responsable Obligatoire** : Un projet doit **toujours posséder au moins un responsable**. Impossible de retirer le dernier responsable sans en nommer un autre.
+2. **Archivage (SoftDeletes)** : La suppression d'un projet est un archivage temporaire. Le projet disparaît des listes actives mais reste consultable/restaurable par le responsable.
+3. **Traitements Asynchrones** :
+   - **Ajout de membre** → Déclenche l'événement `MembreAjouteAuProjet` pour notifier le membre via la file d'attente (Queue).
+   - **Clôture de projet** → Déclenche l'événement `ProjetCloture` pour générer un rapport de synthèse en arrière-plan.
+4. **Sécurité & Middleware** : Toute la gestion de projet exige un compte connecté (Redirection automatique vers `/login` pour les visiteurs).
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## 🚀 Couverture des User Stories (US)
 
-```bash
-composer require laravel/boost --dev
+- [x] **US1** : Inscription et connexion utilisateur (Auth Breeze).
+- [x] **US2** : Création d'un projet par un Responsable (Créateur devient automatiquement Responsable).
+- [x] **US3** : Ajout de membre avec attribution de rôle (Chercheur / Étudiant Assistant).
+- [x] **US4** : Retrait d'un membre avec contrôle du dernier responsable.
+- [x] **US5** : Notification asynchrone envoyée au membre à son ajout (`ShouldQueue`).
+- [x] **US6** : Consultation et mise à jour de l'avancement (`avancement %`) par un Chercheur.
+- [x] **US7** : Consultation en lecture seule par l'Étudiant Assistant.
+- [x] **US8** : Clôture du projet et génération asynchrone du rapport de synthèse.
+- [x] **US9** : Affichage conditionnel des actions dans l'interface selon le rôle (`@can` / Policies).
+- [x] **US10** : Redirection automatique des visiteurs vers `/login`.
 
-php artisan boost:install
+---
+
+## 🗄️ Structure de la Base de Données
+
+```mermaid
+erDiagram
+    users ||--o{ project_user : "appartient à"
+    projects ||--o{ project_user : "contient"
+    
+    users {
+        bigint id PK
+        string name
+        string email
+        string password
+        timestamp created_at
+    }
+
+    projects {
+        bigint id PK
+        string title
+        text description
+        string status "encours / cloture"
+        unsignedTinyInteger avancement "0 - 100%"
+        timestamp deleted_at "SoftDeletes"
+        timestamp created_at
+    }
+
+    project_user {
+        bigint id PK
+        bigint user_id FK
+        bigint project_id FK
+        enum role "responsable / chercheur / etudiant_assistant"
+        timestamp created_at
+    }
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## ⚙️ Guide d'Installation & Configuration
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 1. Prérequis
+- **PHP** >= 8.2
+- **Composer** >= 2.x
+- **Node.js** >= 18.x & NPM
+- **MySQL / MariaDB**
 
-## Code of Conduct
+### 2. Cloner & Installer les Dépendances
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# Cloner le dépôt
+git clone https://github.com/votre-compte/grimoire.git
+cd grimoire
 
-## Security Vulnerabilities
+# Installer les dépendances PHP
+composer install
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Installer les dépendances JavaScript
+npm install
+```
 
-## License
+### 3. Configuration de l'Environnement
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+# Copier le fichier d'environnement
+cp .env.example .env
+
+# Générer la clé d'application
+php artisan key:generate
+```
+
+Configurez les accès à votre base de données dans `.env` :
+
+```ini
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=grimoire
+DB_USERNAME=root
+DB_PASSWORD=
+
+QUEUE_CONNECTION=database
+```
+
+### 4. Migration & Seeding de la Base de Données
+
+```bash
+# Executer les migrations et alimenter la base de données
+php artisan migrate:fresh --seed
+```
+
+#### Comptes de test générés par le Seeder :
+- **Responsable** : `responsable@test.com` / `password`
+- **Chercheur** : `chercheur@test.com` / `password`
+- **Étudiant** : `etudiant@test.com` / `password`
+
+### 5. Lancer l'Application & la Queue Worker
+
+Ouvrez 3 terminaux distincts :
+
+```bash
+# Terminal 1 : Serveur Web Laravel
+php artisan serve
+
+# Terminal 2 : Queue Worker (Notifications & Rapports asynchrones)
+php artisan queue:work
+
+# Terminal 3 : Compilateur d'actifs Tailwind / Vite
+npm run dev
+```
+
+Accédez ensuite à l'application sur [http://localhost:8000](http://localhost:8000).
+
+---
+
+## 🧪 Tests & Audit de Performance
+
+### Tests unitaires & de fonctionnalités :
+```bash
+php artisan test
+```
+
+### Audit des requêtes (N+1 Query Prevention) :
+L'application utilise le chargement anxieux (`with('users')`) sur les relations des projets pour éliminer les problèmes de performance N+1.
+
+---
+
+## 🛠️ Stack Technique
+
+- **Framework** : Laravel 11
+- **Auth** : Laravel Breeze
+- **Front-end** : Blade, Tailwind CSS, Alpine.js
+- **Asynchrone** : Laravel Queues & Event-Listener Pattern
+- **ORM** : Eloquent (avec SoftDeletes & Pivot Table)
+
+---
+
+## 📄 Licence
+
+Ce projet est sous licence [MIT](LICENSE). Développé pour **TechLab Solutions**.
