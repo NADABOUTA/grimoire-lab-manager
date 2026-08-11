@@ -24,7 +24,6 @@ class Project extends Model
     /**
      * Relation many-to-many avec User.
      * withPivot('role') permet d'accéder au rôle depuis la relation.
-     * Exemple : $project->users->first()->pivot->role
      */
     public function users()
     {
@@ -59,17 +58,30 @@ class Project extends Model
 
     /**
      * Vérifier si un utilisateur est responsable de ce projet.
+     *
+     * Utilise la relation users déjà chargée pour éviter
+     * les requêtes SQL répétées.
      */
     public function isResponsable(User $user): bool
     {
-        return $this->responsables()->where('users.id', $user->id)->exists();
+        $this->loadMissing('users');
+
+        return $this->users->contains(function ($membre) use ($user) {
+            return $membre->id === $user->id
+                && $membre->pivot->role === 'responsable';
+        });
     }
 
     /**
-     * Vérifier si un utilisateur est membre de ce projet (quel que soit le rôle).
+     * Vérifier si un utilisateur est membre de ce projet.
+     *
+     * Utilise la relation users déjà chargée.
      */
     public function hasMember(User $user): bool
     {
-        return $this->users()->where('users.id', $user->id)->exists();
+        $this->loadMissing('users');
+
+        return $this->users->contains('id', $user->id);
     }
 }
+

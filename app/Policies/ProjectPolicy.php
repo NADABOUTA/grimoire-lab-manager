@@ -44,14 +44,19 @@ class ProjectPolicy
 
     public function updateAvancement(User $user, Project $project): bool
     {
-        return $project->chercheurs()
-            ->where('users.id', $user->id)
-            ->exists();
+        $project->loadMissing('users');
+
+        return $project->users->contains(function ($membre) use ($user) {
+            return $membre->id === $user->id
+                && $membre->pivot->role === 'chercheur';
+        });
     }
 
     public function viewArchived(User $user): bool
     {
-        return $user->projetsResponsable()->withTrashed()->exists();
+        return $user->projetsResponsable()
+            ->withTrashed()
+            ->exists();
     }
 
     public function cloturer(User $user, Project $project): bool

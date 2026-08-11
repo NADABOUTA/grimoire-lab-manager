@@ -62,14 +62,14 @@ class ProjectController extends Controller
      * Afficher un projet.
      */
     public function show(Project $project)
-    {
-        $this->authorize('view', $project);
+{
+    // Eager Loading des membres avant l'autorisation.
+    $project->load('users');
 
-        // Eager Loading des membres.
-        $project->load('users');
+    $this->authorize('view', $project);
 
-        return view('projects.show', compact('project'));
-    }
+    return view('projects.show', compact('project'));
+}
 
     /**
      * Formulaire de modification.
