@@ -1,6 +1,7 @@
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
     @php
-        $canViewArchived = auth()->user()->can('viewArchived', App\Models\Project::class);
+        $canViewArchived      = auth()->user()->can('viewArchived', App\Models\Project::class);
+        $unreadCount          = auth()->user()->unreadNotifications()->count();
     @endphp
 
 
@@ -31,6 +32,18 @@
                         {{ __('Projets Archivés') }}
                     </x-nav-link>
                 @endif
+
+                {{-- Notifications --}}
+                <x-nav-link :href="route('notifications.index')" :active="request()->routeIs('notifications.index')">
+                    <span class="relative inline-flex items-center gap-1">
+                        {{ __('Notifications') }}
+                        @if($unreadCount > 0)
+                            <span class="inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
+                                {{ $unreadCount > 9 ? '9+' : $unreadCount }}
+                            </span>
+                        @endif
+                    </span>
+                </x-nav-link>
             </div>
         </div>
 
@@ -96,6 +109,18 @@
                 {{ __('Projets Archivés') }}
             </x-responsive-nav-link>
         @endif
+
+        {{-- Notifications mobile --}}
+        <x-responsive-nav-link :href="route('notifications.index')" :active="request()->routeIs('notifications.index')">
+            <span class="flex items-center justify-between">
+                {{ __('Notifications') }}
+                @if($unreadCount > 0)
+                    <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                        {{ $unreadCount > 9 ? '9+' : $unreadCount }}
+                    </span>
+                @endif
+            </span>
+        </x-responsive-nav-link>
     </div>
 
     <!-- Responsive Settings Options -->

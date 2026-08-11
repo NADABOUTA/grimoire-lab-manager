@@ -67,9 +67,8 @@
                             name="status"
                             class="w-full border rounded px-3 py-2"
                         >
-                            <option value="En attente">En attente</option>
-                            <option value="En cours">En cours</option>
-                            <option value="Terminé">Terminé</option>
+                            <option value="encours" {{ old('status') == 'encours' ? 'selected' : '' }}>En cours</option>
+                            <option value="cloture" {{ old('status') == 'cloture' ? 'selected' : '' }}>Clôturé</option>
                         </select>
 
                         @error('status')

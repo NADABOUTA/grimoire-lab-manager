@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\MembreController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use Illuminate\Support\Facades\Route;
@@ -81,6 +82,22 @@ Route::resource('projects', ProjectController::class)    ->withTrashed(['show'])
         '/projects/{project}/membres/{user}',
         [MembreController::class, 'destroy']
     )->name('membres.destroy');
+
+    // =========================
+    // NOTIFICATIONS
+    // =========================
+
+    // Liste des notifications
+    Route::get(
+        '/notifications',
+        [NotificationController::class, 'index']
+    )->name('notifications.index');
+
+    // Marquer une notification comme lue et rediriger
+    Route::patch(
+        '/notifications/{id}/read',
+        [NotificationController::class, 'markRead']
+    )->name('notifications.read');
 
 
     // =========================

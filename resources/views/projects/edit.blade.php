@@ -56,16 +56,12 @@
                             name="status"
                             class="w-full border rounded px-3 py-2">
 
-                            <option value="En attente" @selected(old('status', $project->status) == 'En attente')>
-                                En attente
-                            </option>
-
-                            <option value="En cours" @selected(old('status', $project->status) == 'En cours')>
+                            <option value="encours" @selected(old('status', $project->status) == 'encours')>
                                 En cours
                             </option>
 
-                            <option value="Terminé" @selected(old('status', $project->status) == 'Terminé')>
-                                Terminé
+                            <option value="cloture" @selected(old('status', $project->status) == 'cloture')>
+                                Clôturé
                             </option>
 
                         </select>

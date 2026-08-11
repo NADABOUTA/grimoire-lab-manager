@@ -83,5 +83,24 @@ class Project extends Model
 
         return $this->users->contains('id', $user->id);
     }
-}
 
+    /**
+     * Retourner le libellé lisible du statut.
+     */
+    public function statusLabel(): string
+    {
+        return match ($this->status) {
+            'encours'  => 'En cours',
+            'cloture'  => 'Clôturé',
+            default    => ucfirst($this->status),
+        };
+    }
+
+    /**
+     * Vérifier si le projet est clôturé.
+     */
+    public function isCloture(): bool
+    {
+        return $this->status === 'cloture';
+    }
+}

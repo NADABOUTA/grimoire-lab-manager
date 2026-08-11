@@ -57,10 +57,16 @@
                             </p>
 
                             <div class="mb-2">
-                                <span class="font-semibold">
-                                    Statut :
-                                </span>
-                                {{ $project->status }}
+                                <span class="font-semibold">Statut :</span>
+                                @if($project->status === 'encours')
+                                    <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full ml-1">
+                                        En cours
+                                    </span>
+                                @else
+                                    <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full ml-1">
+                                        Clôturé
+                                    </span>
+                                @endif
                             </div>
 
                             <div class="mb-4">

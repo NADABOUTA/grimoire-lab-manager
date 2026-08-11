@@ -25,6 +25,9 @@ class MembreController extends Controller
     {
         $this->authorize('addMembre', $project);
 
+        // Eager loading explicite — évite le N+1 dans la requête whereNotIn
+        $project->load('users');
+
         // Récupérer les utilisateurs qui ne sont pas encore membres du projet
         $utilisateursDisponibles = User::whereNotIn('id', $project->users->pluck('id'))
                                        ->orderBy('name')
