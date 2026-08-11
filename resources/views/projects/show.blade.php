@@ -25,7 +25,15 @@
 
                 <div class="mb-4">
                     <h3 class="font-bold text-lg">Statut</h3>
-                    <p>{{ $project->status }}</p>
+                    @if($project->status === 'encours')
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 font-semibold rounded-full text-sm">
+                            En cours
+                        </span>
+                    @else
+                        <span class="px-3 py-1 bg-gray-100 text-gray-600 font-semibold rounded-full text-sm">
+                            Clôturé
+                        </span>
+                    @endif
                 </div>
 
                 <div class="mb-6">

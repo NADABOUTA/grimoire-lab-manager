@@ -7,22 +7,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Le rôle d'un utilisateur est propre à chaque projet
+     * et stocké dans la table pivot project_user (colonne role).
+     * Cette migration ne fait rien volontairement.
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('user');
-        });
+        // Intentionnellement vide — le rôle est sur la table pivot project_user
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
-        });
+        // Intentionnellement vide
     }
 };

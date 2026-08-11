@@ -55,7 +55,15 @@
                                 </td>
 
                                 <td class="border px-4 py-2">
-                                    {{ $project->status }}
+                                    @if($project->status === 'encours')
+                                        <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                                            En cours
+                                        </span>
+                                    @else
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full">
+                                            Clôturé
+                                        </span>
+                                    @endif
                                 </td>
 
                                 <td class="border px-4 py-2">

@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
-             $table->string('title');
-        $table->text('description')->nullable();
-        $table->string('status')->default('En cours');
-        $table->unsignedTinyInteger('avancement')->default(0);
+            $table->string('title');
+            $table->text('description')->nullable();
+            // Valeurs possibles : 'encours' | 'cloture'
+            $table->string('status')->default('encours');
+            $table->unsignedTinyInteger('avancement')->default(0);
 
-        $table->softDeletes();
-        $table->timestamps();
+            $table->softDeletes();
+            $table->timestamps();
         });
     }
 
