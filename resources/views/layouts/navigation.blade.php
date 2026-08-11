@@ -15,9 +15,14 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('projects.index')" :active="request()->routeIs('projects.*')">
+                    <x-nav-link :href="route('projects.index')" :active="request()->routeIs('projects.index') || request()->routeIs('projects.show') || request()->routeIs('projects.create') || request()->routeIs('projects.edit')">
                         {{ __('Projets') }}
                     </x-nav-link>
+                    @can('viewArchived', App\Models\Project::class)
+                        <x-nav-link :href="route('projects.archived')" :active="request()->routeIs('projects.archived')">
+                            {{ __('Projets Archivés') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -73,9 +78,14 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('projects.index')" :active="request()->routeIs('projects.*')">
+            <x-responsive-nav-link :href="route('projects.index')" :active="request()->routeIs('projects.index') || request()->routeIs('projects.show')">
                 {{ __('Projets') }}
             </x-responsive-nav-link>
+            @can('viewArchived', App\Models\Project::class)
+                <x-responsive-nav-link :href="route('projects.archived')" :active="request()->routeIs('projects.archived')">
+                    {{ __('Projets Archivés') }}
+                </x-responsive-nav-link>
+            @endcan
         </div>
 
         <!-- Responsive Settings Options -->

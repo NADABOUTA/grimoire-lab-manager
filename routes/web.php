@@ -10,7 +10,13 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $projects = auth()->user()
+        ->projects()
+        ->with('users')
+        ->latest()
+        ->get();
+
+    return view('dashboard', compact('projects'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -33,13 +39,25 @@ Route::middleware('auth')->group(function () {
 
 
     // Clôturer un projet
-Route::patch(
-    '/projects/{project}/cloturer',
-    [ProjectController::class, 'cloturer']
-)->name('projects.cloturer');
+    Route::patch(
+        '/projects/{project}/cloturer',
+        [ProjectController::class, 'cloturer']
+    )->name('projects.cloturer');
+
+    // Restaurer un projet archivé
+    Route::patch(
+        '/projects/{project}/restore',
+        [ProjectController::class, 'restore']
+    )->name('projects.restore')->withTrashed();
+
+    // Supprimer définitivement un projet
+    Route::delete(
+        '/projects/{project}/force-delete',
+        [ProjectController::class, 'forceDelete']
+    )->name('projects.forceDelete')->withTrashed();
 
     // CRUD des projets
-    Route::resource('projects', ProjectController::class);
+Route::resource('projects', ProjectController::class)    ->withTrashed(['show']);
 
 
     // =========================

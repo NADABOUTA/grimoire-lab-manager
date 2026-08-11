@@ -51,7 +51,7 @@ class ProjectPolicy
 
     public function viewArchived(User $user): bool
     {
-        return $user->projetsResponsable()->exists();
+        return $user->projetsResponsable()->withTrashed()->exists();
     }
 
     public function cloturer(User $user, Project $project): bool

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -14,14 +13,8 @@ use Illuminate\Notifications\Notifiable;
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -31,9 +24,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Tache 3 — Relation many-to-many avec Project.
-     * withPivot('role') permet d'accéder au rôle depuis la relation.
-     * Exemple : $user->projects->first()->pivot->role
+     * Relation Many-to-Many avec les projets.
      */
     public function projects()
     {
@@ -43,15 +34,16 @@ class User extends Authenticatable
     }
 
     /**
-     * Récupérer les projets où l'utilisateur est responsable.
+     * Projets où l'utilisateur est responsable.
      */
     public function projetsResponsable()
     {
-        return $this->projects()->wherePivot('role', 'responsable');
+        return $this->projects()
+                    ->wherePivot('role', 'responsable');
     }
 
     /**
-     * Vérifier si l'utilisateur est responsable d'un projet donné.
+     * Vérifier si l'utilisateur est responsable d'un projet.
      */
     public function isResponsableOf(Project $project): bool
     {
@@ -62,8 +54,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Récupérer le rôle de l'utilisateur dans un projet donné.
-     * Retourne null si l'utilisateur n'est pas membre du projet.
+     * Récupérer le rôle de l'utilisateur dans un projet.
      */
     public function getRoleInProject(Project $project): ?string
     {

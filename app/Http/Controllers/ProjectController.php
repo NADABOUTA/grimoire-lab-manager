@@ -170,4 +170,32 @@ public function cloturer(Project $project)
 
         return view('projects.archived', compact('projects'));
     }
+
+    /**
+     * Restaurer un projet archivé.
+     */
+    public function restore(Project $project)
+    {
+        $this->authorize('restore', $project);
+
+        $project->restore();
+
+        return redirect()
+            ->route('projects.archived')
+            ->with('success', 'Projet restauré avec succès.');
+    }
+
+    /**
+     * Supprimer définitivement un projet archivé.
+     */
+    public function forceDelete(Project $project)
+    {
+        $this->authorize('forceDelete', $project);
+
+        $project->forceDelete();
+
+        return redirect()
+            ->route('projects.archived')
+            ->with('success', 'Projet supprimé définitivement.');
+    }
 }

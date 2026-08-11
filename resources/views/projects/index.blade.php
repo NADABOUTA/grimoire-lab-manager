@@ -14,14 +14,23 @@
                 </div>
             @endif
 
-            @can('create', App\Models\Project::class)
-                <div class="flex justify-end mb-4">
+            <div class="flex justify-between items-center mb-4">
+                @can('viewArchived', App\Models\Project::class)
+                    <a href="{{ route('projects.archived') }}"
+                       class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+                        📦 Projets Archivés
+                    </a>
+                @else
+                    <div></div>
+                @endcan
+
+                @can('create', App\Models\Project::class)
                     <a href="{{ route('projects.create') }}"
                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                         + Ajouter un projet
                     </a>
-                </div>
-            @endcan
+                @endcan
+            </div>
 
             <div class="bg-white shadow rounded-lg overflow-hidden">
 

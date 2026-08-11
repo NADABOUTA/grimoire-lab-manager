@@ -1,6 +1,5 @@
 <x-app-layout>
 
-```
 <x-slot name="header">
     <h2 class="font-semibold text-xl text-gray-800 leading-tight">
         Détails du projet
@@ -52,6 +51,24 @@
                         Modifier
                     </a>
                 @endcan
+
+
+{{-- Seul le responsable peut clôturer --}}
+@can('cloturer', $project)
+    <form action="{{ route('projects.cloturer', $project) }}"
+          method="POST">
+
+        @csrf
+        @method('PATCH')
+
+        <button type="submit"
+                onclick="return confirm('Clôturer ce projet ?')"
+                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+            Clôturer le projet
+        </button>
+    </form>
+@endcan
+
 
                 {{-- Seul le responsable peut archiver --}}
                 @can('delete', $project)
@@ -223,6 +240,5 @@
 
     </div>
 </div>
-```
 
 </x-app-layout>
